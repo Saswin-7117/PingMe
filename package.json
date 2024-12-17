@@ -1,0 +1,16 @@
+{
+  "name": "devtinder",
+  "version": "1.0.0",
+  "description": "community for devs to connect",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "author": "Saswin",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.1",
+    "mongoose": "^8.7.1"
+  }
+}
