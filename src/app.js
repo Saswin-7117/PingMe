@@ -1,9 +1,11 @@
 const express = require("express");
+const dotenv = require("dotenv");
 const { connectDB } = require("./config/database");
 const { User } = require("./models/user.js");
 const bcrypt = require("bcrypt");
 const { validateSignUpData } = require("./utils/validation.js");
 
+dotenv.config();
 const app = express();
 app.use(express.json());
 
