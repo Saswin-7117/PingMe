@@ -4,10 +4,14 @@ const { connectDB } = require("./config/database");
 const { User } = require("./models/user.js");
 const bcrypt = require("bcrypt");
 const { validateSignUpData } = require("./utils/validation.js");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
+const { userAuth } = require("./middlewares/auth.js");
 
 dotenv.config();
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 
 app.post("/signup", async(req,res)=>{
     try{
@@ -33,16 +37,32 @@ app.post("/login",async(req,res)=>{
     if (!user) { 
       throw new Error("Invalid credentials");
     }
-    const isPasswordValid = await bcrypt.compare(password,user.password);
+    const isPasswordValid = await user.validatePassword(password);
 
     if (isPasswordValid) {
-      res.send("Login successful");
+        const token = await user.getJWT();
+        res.cookie("token",token,{expires: new Date(Date.now()+ 3600000)});
+        res.send("Login successful");
+
     } else {
       throw new Error("Invalid credentials");
     }
   } catch (err) {
     res.status(400).send("ERROR : " + err.message);
   }
+})
+
+app.get("/profile", userAuth, async(req,res)=>{
+    try{
+        const user = req.user;
+        res.send(user.firstName);
+    }catch (err) {
+        res.status(400).send("ERROR : "  + err.message);
+    }
+})
+
+app.post("/sendConnectionRequest",userAuth,async(req,res)=>{
+    res.send("Connection request Sent");
 })
 
 app.get("/user",async (req,res)=>{
@@ -61,7 +81,7 @@ app.get("/user",async (req,res)=>{
     } 
 })
 
-app.get("/feed",async (req,res)=>{
+app.get("/feed", userAuth, async (req,res)=>{
     try{
         const users = await User.find({});
         if(users.length===0){
