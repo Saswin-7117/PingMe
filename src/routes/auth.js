@@ -8,11 +8,11 @@ const authRouter = express.Router();
 authRouter.post("/signup", async(req,res)=>{
     try{
         validateSignUpData(req);
-        const { firstName, lastName, emailId, password } = req.body; 
+        const { firstName, lastName, emailId, password,age,gender } = req.body; 
 
         const passwordHash = await bcrypt.hash(password,10);
 
-        const user = new User({firstName,lastName,emailId,password:passwordHash});
+        const user = new User({firstName,lastName,emailId,password:passwordHash,age,gender});
         await user.save();
         res.status(201).send("User created successfully");
     }
